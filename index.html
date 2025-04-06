@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Manager</title>
+  
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .task-list { margin-top: 20px; }
+    .task-item { display: flex; justify-content: space-between; align-items: center; margin: 5px 0; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2 class="text-center mt-5">Task Manager</h2>
+
+  <input type="text" id="taskInput" class="form-control" placeholder="Enter new task" required>
+  <button id="addTaskBtn" class="btn btn-primary mt-3">Add Task</button>
+
+  <div id="taskList" class="task-list mt-4"></div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  $(document).ready(function () {
+    
+    loadTasks();
+
+    
+    $('#addTaskBtn').click(function () {
+      const taskText = $('#taskInput').val().trim();
+      if (taskText) {
+        let tasks = getTasks();
+        tasks.push({ id: Date.now(), text: taskText });
+        saveTasks(tasks);
+        $('#taskInput').val('');  
+        loadTasks();  
+      }
+    });
+
+
+    $(document).on('click', '.delete-btn', function () {
+      const taskId = $(this).data('id');
+      let tasks = getTasks();
+      tasks = tasks.filter(task => task.id !== taskId);  
+      saveTasks(tasks);  
+      loadTasks();  
+    });
+
+    function loadTasks() {
+      const tasks = getTasks();
+      $('#taskList').empty();
+      tasks.forEach(task => {
+        $('#taskList').append(`
+          <div class="task-item">
+            <span>${task.text}</span>
+            <button class="btn btn-danger btn-sm delete-btn" data-id="${task.id}">Delete</button>
+          </div>
+        `);
+      });
+    }
+
+    function getTasks() {
+      const tasks = localStorage.getItem('tasks');
+      return tasks ? JSON.parse(tasks) : [];
+    }
+
+    function saveTasks(tasks) {
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+  });
+</script>
+
+</body>
+</html>
